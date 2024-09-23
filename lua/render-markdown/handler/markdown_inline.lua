@@ -146,7 +146,26 @@ function Handler:wiki_link(info)
     if link_component ~= nil then
         icon, highlight = link_component.icon, link_component.highlight
     end
-    local link_text = icon .. parts[#parts]
+
+    -- Find if LSP provided title in diagnostic
+    local function get_title(buf, row, col)
+        local col = col - 1
+        local diagnostic = vim.diagnostic.get(buf)
+        for _, value in pairs(diagnostic) do
+            if value['col'] == col and value['lnum'] == row then
+                return value['message']
+            end
+        end
+        return nil
+    end
+
+    local message = parts[#parts]
+    local title = get_title(info.buf, info.start_row, info.start_col)
+    if title ~= nil and #parts == 1 then -- #parts > 1 indicate that there is custom title
+        message = title
+    end
+
+    local link_text = icon .. message
     local added = self.marks:add(true, info.start_row, info.start_col - 1, {
         end_row = info.end_row,
         end_col = info.end_col + 1,
