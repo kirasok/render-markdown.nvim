@@ -152,7 +152,7 @@ function Handler:wiki_link(info)
         local col = col - 1
         local diagnostic = vim.diagnostic.get(buf)
         for _, value in pairs(diagnostic) do
-            if value['col'] == col and value['lnum'] == row then
+            if value['severity'] == 4 and value['col'] == col and value['lnum'] == row then
                 return value['message']
             end
         end
