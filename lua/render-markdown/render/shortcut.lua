@@ -94,6 +94,10 @@ end
 
 ---@private
 function Render:wiki_link()
+    if not self.config.link.enabled then
+        return
+    end
+
     local parts = Str.split(self.node.text:sub(2, -2), '|')
     local link_component = self:link_component(parts[1])
     local icon, highlight = self.config.link.wiki.icon, self.config.link.wiki.highlight
