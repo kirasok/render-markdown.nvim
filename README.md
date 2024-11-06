@@ -512,7 +512,7 @@ require('render-markdown').setup({
         -- Applies to the fallback inlined icon
         highlight = 'RenderMarkdownLink',
         -- Applies to WikiLink elements
-        wiki = { icon = '󱗖 ', highlight = 'RenderMarkdownWikiLink' },
+        wiki = { enabled = true, icon = '󱗖 ', highlight = 'RenderMarkdownWikiLink' },
         -- Define custom destination patterns so icons can quickly inform you of what a link
         -- contains. Applies to 'inline_link' and wikilink nodes.
         -- Can specify as many additional values as you like following the 'web' pattern below
@@ -1043,7 +1043,7 @@ require('render-markdown').setup({
         -- Applies to the fallback inlined icon
         highlight = 'RenderMarkdownLink',
         -- Applies to WikiLink elements
-        wiki = { icon = '󱗖 ', highlight = 'RenderMarkdownWikiLink' },
+        wiki = { enabled = true, icon = '󱗖 ', highlight = 'RenderMarkdownWikiLink' },
         -- Define custom destination patterns so icons can quickly inform you of what a link
         -- contains. Applies to 'inline_link' and wikilink nodes.
         -- Can specify as many additional values as you like following the 'web' pattern below

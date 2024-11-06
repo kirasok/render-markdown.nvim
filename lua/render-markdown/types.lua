@@ -34,6 +34,7 @@
 ---@field public highlight string
 
 ---@class (exact) render.md.WikiLink
+---@field public enabled boolean
 ---@field public icon string
 ---@field public highlight string
 
