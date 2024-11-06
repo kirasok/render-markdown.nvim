@@ -166,6 +166,7 @@
 ---@field public max_file_size number
 ---@field public debounce integer
 ---@field public render_modes string[]|boolean
+---@field public append_change_events string[]
 ---@field public anti_conceal render.md.AntiConceal
 ---@field public padding render.md.Padding
 ---@field public heading render.md.Heading

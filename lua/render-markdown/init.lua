@@ -212,6 +212,7 @@ local M = {}
 ---@field public max_file_size? number
 ---@field public debounce? integer
 ---@field public render_modes? string[]|boolean
+---@field public append_change_events? string[]
 ---@field public anti_conceal? render.md.UserAntiConceal
 ---@field public padding? render.md.UserPadding
 ---@field public heading? render.md.UserHeading
@@ -283,6 +284,8 @@ M.default_config = {
     -- Vim modes that will show a rendered view of the markdown file
     -- All other modes will be unaffected by this plugin
     render_modes = { 'n', 'c' },
+    -- Additional :h events on which screen will be updated
+    append_change_events = {},
     anti_conceal = {
         -- This enables hiding any added text on the line the cursor is on
         enabled = true,

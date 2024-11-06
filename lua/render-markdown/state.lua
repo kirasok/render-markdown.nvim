@@ -103,6 +103,7 @@ function M.default_buffer_config()
         max_file_size = config.max_file_size,
         debounce = config.debounce,
         render_modes = config.render_modes,
+        append_change_events = config.append_change_events,
         anti_conceal = config.anti_conceal,
         padding = config.padding,
         heading = config.heading,
@@ -253,6 +254,7 @@ function M.validate()
         :type({ 'dash', 'bullet', 'checkbox', 'quote', 'pipe_table' }, 'table')
         :type({ 'callout', 'link', 'sign', 'indent', 'win_options' }, 'table')
         :list('render_modes', 'string', 'boolean')
+        :list('append_change_events', 'string')
         :type('log_runtime', 'boolean')
         :type({ 'injections', 'latex', 'on', 'overrides', 'custom_handlers' }, 'table')
         :list('file_types', 'string')
@@ -284,6 +286,7 @@ function M.validate()
                 :type({ 'dash', 'bullet', 'checkbox', 'quote', 'pipe_table' }, 'table')
                 :type({ 'callout', 'link', 'sign', 'indent', 'win_options' }, 'table')
                 :list('render_modes', 'string', 'boolean')
+                :list('append_change_events', 'string')
             validate_buffer_config(spec:get_config(), true, spec:get_path())
         end)
     end)

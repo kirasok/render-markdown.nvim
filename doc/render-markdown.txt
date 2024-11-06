@@ -216,6 +216,8 @@ Default Configuration ~
         -- Vim modes that will show a rendered view of the markdown file
         -- All other modes will be unaffected by this plugin
         render_modes = { 'n', 'c' },
+	-- Additional :h events on which screen will be updated
+	append_change_events = {},
         anti_conceal = {
             -- This enables hiding any added text on the line the cursor is on
             enabled = true,
@@ -610,7 +612,7 @@ Default Configuration ~
         -- More granular configuration mechanism, allows different aspects of buffers
         -- to have their own behavior. Values default to the top level configuration
         -- if no override is provided. Supports the following fields:
-        --   enabled, max_file_size, debounce, render_modes, anti_conceal, padding,
+        --   enabled, max_file_size, debounce, render_modes, append_change_events, anti_conceal, padding,
         --   heading, paragraph, code, dash, bullet, checkbox, quote, pipe_table,
         --   callout, link, sign, indent, win_options
         overrides = {
