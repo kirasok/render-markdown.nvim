@@ -96,13 +96,33 @@ function Render:wiki_link()
         return
     end
 
+    ---@return string? message
+    -- Matches node and diagnostic
+    local function get_from_diagnostics()
+        local buf = self.node.buf
+        local col = self.node.start_col - 1
+        local row = self.node.start_row
+        local diagnostic = vim.diagnostic.get(buf)
+        for _, value in pairs(diagnostic) do
+            if value['severity'] == vim.diagnostic.severity.HINT and value['col'] == col and value['lnum'] == row then
+                return value['message']
+            end
+        end
+        return nil
+    end
+
     local parts = Str.split(self.node.text:sub(2, -2), '|')
     local link_component = self:link_component(parts[1])
     local icon, highlight = self.config.link.wiki.icon, self.config.link.wiki.highlight
     if link_component ~= nil then
         icon, highlight = link_component.icon, link_component.highlight
     end
-    local link_text = icon .. parts[#parts]
+    local link_text = icon
+    if self.config.link.wiki.fetch_from_diagnostics and #parts == 1 then -- #parts > 1 indicate that there is custom title
+        link_text = link_text .. (get_from_diagnostics() or parts[#parts])
+    else
+        link_text = link_text .. parts[#parts]
+    end
     local added = self.marks:add('link', self.node.start_row, self.node.start_col - 1, {
         end_row = self.node.end_row,
         end_col = self.node.end_col + 1,

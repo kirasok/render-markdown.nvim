@@ -49,6 +49,7 @@ local M = {}
 ---@class (exact) render.md.UserWikiLink
 ---@field public icon? string
 ---@field public highlight? string
+---@field public fetch_from_diagnostics? boolean
 
 ---@class (exact) render.md.UserLink
 ---@field public enabled? boolean
@@ -625,7 +626,7 @@ M.default_config = {
         -- Applies to the fallback inlined icon
         highlight = 'RenderMarkdownLink',
         -- Applies to WikiLink elements
-        wiki = { icon = '󱗖 ', highlight = 'RenderMarkdownWikiLink' },
+        wiki = { icon = '󱗖 ', highlight = 'RenderMarkdownWikiLink', fetch_from_diagnostics = false },
         -- Define custom destination patterns so icons can quickly inform you of what a link
         -- contains. Applies to 'inline_link' and wikilink nodes.
         -- Can specify as many additional values as you like following the 'web' pattern below

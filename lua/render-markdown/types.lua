@@ -36,6 +36,7 @@
 ---@class (exact) render.md.WikiLink
 ---@field public icon string
 ---@field public highlight string
+---@field public fetch_from_diagnostics boolean
 
 ---@class (exact) render.md.Link
 ---@field public enabled boolean
