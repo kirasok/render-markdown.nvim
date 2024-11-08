@@ -35,7 +35,7 @@ function M.valid(buf, win)
     if not vim.api.nvim_buf_is_valid(buf) then
         return false
     end
-    if not vim.api.nvim_win_is_valid(win) then
+    if win == nil or not vim.api.nvim_win_is_valid(win) then
         return false
     end
     return buf == vim.fn.winbufnr(win)
