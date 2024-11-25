@@ -24,10 +24,6 @@
 ---@field public skip_level integer
 ---@field public skip_heading boolean
 
----@class (exact) render.md.InlineHighlight
----@field public enabled boolean
----@field public highlight string
-
 ---@class (exact) render.md.Sign
 ---@field public enabled boolean
 ---@field public highlight string
@@ -115,7 +111,7 @@
 ---@field public position render.md.code.Position
 ---@field public language_pad number
 ---@field public language_name boolean
----@field public disable_background boolean|string[]
+---@field public disable_background string[]
 ---@field public width render.md.code.Width
 ---@field public left_margin number
 ---@field public left_pad number
@@ -144,7 +140,7 @@
 ---@field public left_pad number|number[]
 ---@field public right_pad number|number[]
 ---@field public min_width integer|integer[]
----@field public border boolean|boolean[]
+---@field public border boolean
 ---@field public border_virtual boolean
 ---@field public border_prefix boolean
 ---@field public above string
@@ -169,7 +165,7 @@
 ---@field public enabled boolean
 ---@field public max_file_size number
 ---@field public debounce integer
----@field public render_modes boolean|string[]
+---@field public render_modes string[]|boolean
 ---@field public append_change_events string[]
 ---@field public anti_conceal render.md.AntiConceal
 ---@field public padding render.md.Padding
@@ -184,7 +180,6 @@
 ---@field public callout table<string, render.md.CustomCallout>
 ---@field public link render.md.Link
 ---@field public sign render.md.Sign
----@field public inline_highlight render.md.InlineHighlight
 ---@field public indent render.md.Indent
 ---@field public win_options table<string, render.md.WindowOption>
 

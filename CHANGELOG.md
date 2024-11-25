@@ -2,22 +2,6 @@
 
 ## Pre-release
 
-### Features
-
-- disabling background for code now keeps border [#220](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/220)
-  [bee16b2](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/bee16b21bf47b64ceda8c9bb281d4b576d329c0f)
-- table support for all conceal levels [3da1bfc](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/3da1bfc4bd3a13fee57551f0b705ebcf2614d7a2)
-- roll own type validation to remove vim.validate [d69a885](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/d69a885e1bf21cb329d2eafe56fd80b6de627216)
-- code block language icon from extension [#233](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/233)
-  [78a2eb7](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/78a2eb7fc273f36790aa390262f390a3265eedff)
-- log_level off [#235](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/235)
-  [48a52dd](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/48a52dd5c847c59eac6ae5b96ff0123acd1a394d)
-
-### Bug Fixes
-
-- padding & margin for code blocks indented with tabs [#230](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/230)
-  [d80acb3](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/d80acb3f4ccc88052f65fa0a26e46c106b328bbe)
-
 ## 7.5.0 (2024-11-04)
 
 ### Features

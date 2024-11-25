@@ -25,7 +25,7 @@ local M = {}
 ---@field public enabled? boolean
 ---@field public query? string
 
----@alias render.md.option.Value number|integer|string|boolean
+---@alias render.md.option.Value number|string|boolean
 
 ---@class (exact) render.md.UserWindowOption
 ---@field public default? render.md.option.Value
@@ -36,10 +36,6 @@ local M = {}
 ---@field public per_level? integer
 ---@field public skip_level? integer
 ---@field public skip_heading? boolean
-
----@class (exact) render.md.UserInlineHighlight
----@field public enabled? boolean
----@field public highlight? string
 
 ---@class (exact) render.md.UserSign
 ---@field public enabled? boolean
@@ -139,7 +135,7 @@ local M = {}
 ---@field public position? render.md.code.Position
 ---@field public language_pad? number
 ---@field public language_name? boolean
----@field public disable_background? boolean|string[]
+---@field public disable_background? string[]
 ---@field public width? render.md.code.Width
 ---@field public left_margin? number
 ---@field public left_pad? number
@@ -157,7 +153,7 @@ local M = {}
 ---@field public left_margin? number
 ---@field public min_width? integer
 
----@alias render.md.heading.Position 'overlay'|'inline'|'right'
+---@alias render.md.heading.Position 'overlay'|'inline'
 ---@alias render.md.heading.Width 'full'|'block'
 
 ---@class (exact) render.md.UserHeading
@@ -171,7 +167,7 @@ local M = {}
 ---@field public left_pad? number|number[]
 ---@field public right_pad? number|number[]
 ---@field public min_width? integer|integer[]
----@field public border? boolean|boolean[]
+---@field public border? boolean
 ---@field public border_virtual? boolean
 ---@field public border_prefix? boolean
 ---@field public above? string
@@ -199,7 +195,7 @@ local M = {}
 ---| 'link'
 ---| 'sign'
 
----@alias render.md.config.conceal.Ignore table<render.md.Element, boolean|string[]>
+---@alias render.md.config.conceal.Ignore table<render.md.Element, string[]|boolean>
 
 ---@class (exact) render.md.UserAntiConceal
 ---@field public enabled? boolean
@@ -215,7 +211,7 @@ local M = {}
 ---@field public enabled? boolean
 ---@field public max_file_size? number
 ---@field public debounce? integer
----@field public render_modes? boolean|string[]
+---@field public render_modes? string[]|boolean
 ---@field public append_change_events? string[]
 ---@field public anti_conceal? render.md.UserAntiConceal
 ---@field public padding? render.md.UserPadding
@@ -230,12 +226,11 @@ local M = {}
 ---@field public callout? table<string, render.md.UserCustomCallout>
 ---@field public link? render.md.UserLink
 ---@field public sign? render.md.UserSign
----@field public inline_highlight? render.md.UserInlineHighlight
 ---@field public indent? render.md.UserIndent
 ---@field public win_options? table<string, render.md.UserWindowOption>
 
 ---@alias render.md.config.Preset 'none'|'lazy'|'obsidian'
----@alias render.md.config.LogLevel 'off'|'debug'|'info'|'error'
+---@alias render.md.config.LogLevel 'debug'|'info'|'error'
 
 ---@class (exact) render.md.UserConfig: render.md.UserBufferConfig
 ---@field public preset? render.md.config.Preset
@@ -334,9 +329,8 @@ M.default_config = {
         -- Turn on / off any sign column related rendering
         sign = true,
         -- Determines how icons fill the available space:
-        --  right:   '#'s are concealed and icon is appended to right side
-        --  inline:  '#'s are concealed and icon is inlined on left side
-        --  overlay: icon is left padded with spaces and inserted on left hiding any additional '#'
+        --  inline:  underlying '#'s are concealed resulting in a left aligned icon
+        --  overlay: result is left padded with spaces to hide any additional '#'
         position = 'overlay',
         -- Replaces '#+' of 'atx_h._marker'
         -- The number of '#' in the heading determines the 'level'
@@ -368,7 +362,6 @@ M.default_config = {
         -- Can also be a list of integers in which case the 'level' is used to index into the list using a clamp
         min_width = 0,
         -- Determines if a border is added above and below headings
-        -- Can also be a list of booleans in which case the 'level' is used to index into the list using a clamp
         border = false,
         -- Always use virtual lines for heading borders instead of attempting to use empty lines
         border_virtual = false,
@@ -430,8 +423,6 @@ M.default_config = {
         language_name = true,
         -- A list of language names for which background highlighting will be disabled
         -- Likely because that language has background highlights itself
-        -- Or a boolean to make behavior apply to all languages
-        -- Borders above & below blocks will continue to be rendered
         disable_background = { 'diff' },
         -- Width of the code block background:
         --  block: width of the code block
@@ -655,14 +646,6 @@ M.default_config = {
         enabled = true,
         -- Applies to background of sign text
         highlight = 'RenderMarkdownSign',
-    },
-    -- Mimics Obsidian inline highlights when content is surrounded by double equals
-    -- The equals on both ends are concealed and the inner content is highlighted
-    inline_highlight = {
-        -- Turn on / off inline highlight rendering
-        enabled = true,
-        -- Applies to background of surrounded text
-        highlight = 'RenderMarkdownInlineHighlight',
     },
     -- Mimic org-indent-mode behavior by indenting everything under a heading based on the
     -- level of the heading. Indenting starts from level 2 headings onward.

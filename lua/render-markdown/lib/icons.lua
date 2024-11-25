@@ -7,14 +7,11 @@ local M = {}
 ---@param language string
 ---@return string?, string?
 function M.get(language)
-    -- Handle input possibly being an extension rather than a language name
-    local file_type = vim.filetype.match({ filename = 'a.' .. language }) or language
-
     if has_mini_icons then
         ---@diagnostic disable-next-line: return-type-mismatch
-        return mini_icons.get('filetype', file_type)
+        return mini_icons.get('filetype', language)
     elseif has_devicons then
-        return devicons.get_icon_by_filetype(file_type)
+        return devicons.get_icon_by_filetype(language)
     else
         return nil, nil
     end

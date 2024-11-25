@@ -47,12 +47,6 @@ function M.mode()
 end
 
 ---@param buf integer
----@return integer[]
-function M.windows(buf)
-    return vim.fn.win_findbuf(buf)
-end
-
----@param buf integer
 ---@param win integer
 ---@return integer?
 function M.row(buf, win)
@@ -76,11 +70,6 @@ end
 ---@param id integer
 ---@param name string
 ---@return render.md.option.Value
----@overload fun(variant: 'buf', id: integer, name: 'buftype'): string
----@overload fun(variant: 'buf', id: integer, name: 'filetype'): string
----@overload fun(variant: 'buf', id: integer, name: 'tabstop'): integer
----@overload fun(variant: 'win', id: integer, name: 'conceallevel'): integer
----@overload fun(variant: 'win', id: integer, name: 'diff'): boolean
 function M.get(variant, id, name)
     if variant == 'buf' then
         return vim.api.nvim_get_option_value(name, { buf = id })
@@ -125,20 +114,9 @@ function M.textoff(win)
     return #infos == 1 and infos[1].textoff or 0
 end
 
----@param buf integer
----@return string
-function M.file_name(buf)
-    local file = vim.api.nvim_buf_get_name(buf)
-    return vim.fn.fnamemodify(file, ':t')
-end
-
----@param source string|integer
+---@param file string
 ---@return number
-function M.file_size_mb(source)
-    local file = source
-    if type(file) == 'number' then
-        file = vim.api.nvim_buf_get_name(file)
-    end
+function M.file_size_mb(file)
     local ok, stats = pcall(function()
         return (vim.uv or vim.loop).fs_stat(file)
     end)

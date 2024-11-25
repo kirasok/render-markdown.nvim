@@ -28,7 +28,7 @@ local function border(row, level, position)
         { '', 'Normal' },
         { '', background },
         { '', foreground },
-        { icon:rep(vim.o.columns), background },
+        { icon:rep(vim.opt.columns:get()), background },
     }
     local virtual = row == 0 and position == 'above'
     if virtual then
@@ -59,6 +59,7 @@ describe('indent.md', function()
             indent(row:get()),
             util.heading(row:get(), 2),
             indent(row:increment()),
+            border(row:get(), 2, 'below'),
         })
         vim.list_extend(expected, {
             util.table_border(row:increment(), true, { 5, 5 }, 2),
@@ -86,20 +87,7 @@ describe('indent.md', function()
         })
         table.insert(expected, indent(row:increment(), 2))
 
-        util.assert_view(expected, {
-            '󰫎   1    󰲣 Heading 2',
-            '    2',
-            '        ┌─────┬─────┐',
-            '    3   │ Foo │ Bar │',
-            '    4   ├─────┼─────┤',
-            '    5 ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄',
-            '󰫎   6 󰲡 Heading 1',
-            '    7 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀',
-            '    8 Foo',
-            '    9     ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄',
-            '󰫎  10       󰲥 Heading 3',
-            '   11     ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀',
-            '   12     Bar',
-        })
+        local actual = util.get_actual_marks()
+        util.marks_are_equal(expected, actual)
     end)
 end)

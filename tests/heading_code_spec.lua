@@ -22,32 +22,9 @@ describe('heading_code.md', function()
         for _ = 13, 21 do
             table.insert(expected, util.code_row(row:increment(), 0))
         end
-        table.insert(expected, util.code_border(row:increment(), 0, false))
+        table.insert(expected, util.code_below(row:increment(), 0))
 
-        util.assert_view(expected, {
-            '󰫎   1 󰲡 Heading 1',
-            '    2',
-            '󰫎   3   󰲥 Heading 3',
-            '    4',
-            '󰫎   5    󰲧 Heading 4',
-            '    6',
-            '󰫎   7     󰲩 Heading 5',
-            '    8',
-            '󰫎   9      󰲫 Heading 6',
-            '   10',
-            '   11 󰥶 Image',
-            '   12',
-            '󰌠  13 󰌠 python {filename="demo.py"}',
-            '   14 def main() -> None:',
-            '   15     sum = 0',
-            '   16     for i in range(10):',
-            '   17         sum += i',
-            '   18     print(sum)',
-            '   19',
-            '   20',
-            '   21 if __name__ == "__main__":',
-            '   22     main()',
-            '   23 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀',
-        })
+        local actual = util.get_actual_marks()
+        util.marks_are_equal(expected, actual)
     end)
 end)

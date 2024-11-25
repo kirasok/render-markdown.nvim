@@ -71,18 +71,7 @@ describe('ad_hoc.md', function()
             bullet_link(row:increment(), 59, ' ', 'Link', nil),
         })
 
-        util.assert_view(expected, {
-            '󰫎   1 󰲡 Heading',
-            '    2',
-            '󰫎   3 󰲣 Heading 2 Line 1',
-            '    4   Heading 2 Line 2',
-            '    5',
-            '    6',
-            '    7 ● Normal Shortcut',
-            '    8 ● 󱗖 Basic One Then normal text',
-            '    9 ● 󱗖 With Alias Something important',
-            '   10 ● 󰀓 test@example.com Email',
-            '   11 ●  Youtube Link',
-        })
+        local actual = util.get_actual_marks()
+        util.marks_are_equal(expected, actual)
     end)
 end)

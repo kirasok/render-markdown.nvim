@@ -112,10 +112,8 @@ function M.run_update(buf, win, parse)
     local next_state = M.next_state(config, win, mode)
 
     log.buf('info', 'state', buf, next_state)
-    for _, window in ipairs(util.windows(buf)) do
-        for name, value in pairs(config.win_options) do
-            util.set('win', window, name, value[next_state])
-        end
+    for name, value in pairs(config.win_options) do
+        util.set('win', win, name, value[next_state])
     end
 
     if next_state == 'rendered' then

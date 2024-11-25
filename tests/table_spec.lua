@@ -25,13 +25,6 @@ describe('table.md', function()
             util.table_padding(row:get(), 15, 16),
             util.link(row:get(), 15, 38, 'web'),
             util.table_pipe(row:get(), 39, false),
-            util.table_pipe(row:increment(), 0, false),
-            util.table_padding(row:get(), 12, 8),
-            util.table_pipe(row:get(), 12, false),
-            util.table_padding(row:get(), 14, 16),
-            util.inline_highlight(row:get(), 14, 24),
-            util.conceal(row:get(), 25, 37),
-            util.table_pipe(row:get(), 37, false),
             util.table_border(row:get(), false, { 11, 24 }),
         })
 
@@ -48,24 +41,8 @@ describe('table.md', function()
             util.table_border(row:get(), false, { 11, 11 }),
         })
 
-        util.assert_view(expected, {
-            '󰫎   1 󰲡 Table with Inline',
-            '    2',
-            '      ┌───────────┬────────────────────────┐',
-            '    3 │ Heading 1 │              Heading 2 │',
-            '    4 ├───────────┼───────────────────────━┤',
-            '    5 │ Item 行   │                 󰖟 link │',
-            '    6 │ 1         │                 Item 2 │',
-            '      └───────────┴────────────────────────┘',
-            '    7',
-            '󰫎   8 󰲡 Table no Inline',
-            '    9',
-            '      ┌───────────┬───────────┐',
-            '   10 │ Heading 1 │ Heading 2 │',
-            '   11 ├───────────┼───────────┤',
-            '   12 │ Item 1    │ Item 2    │',
-            '      └───────────┴───────────┘',
-        })
+        local actual = util.get_actual_marks()
+        util.marks_are_equal(expected, actual)
     end)
 
     it('trimmed', function()
@@ -89,13 +66,6 @@ describe('table.md', function()
             util.table_padding(row:get(), 15, 3),
             util.link(row:get(), 15, 38, 'web'),
             util.table_pipe(row:get(), 39, false),
-            util.table_pipe(row:increment(), 0, false),
-            util.table_padding(row:get(), 12, 8),
-            util.table_pipe(row:get(), 12, false),
-            util.table_padding(row:get(), 14, 3),
-            util.inline_highlight(row:get(), 14, 24),
-            util.conceal(row:get(), 25, 37),
-            util.table_pipe(row:get(), 37, false),
             util.table_border(row:get(), false, { 11, 11 }),
         })
 
@@ -112,24 +82,8 @@ describe('table.md', function()
             util.table_border(row:get(), false, { 11, 11 }),
         })
 
-        util.assert_view(expected, {
-            '󰫎   1 󰲡 Table with Inline',
-            '    2',
-            '      ┌───────────┬───────────┐',
-            '    3 │ Heading 1 │ Heading 2 │',
-            '    4 ├───────────┼──────────━┤',
-            '    5 │ Item 行   │    󰖟 link │',
-            '    6 │ 1         │    Item 2 │',
-            '      └───────────┴───────────┘',
-            '    7',
-            '󰫎   8 󰲡 Table no Inline',
-            '    9',
-            '      ┌───────────┬───────────┐',
-            '   10 │ Heading 1 │ Heading 2 │',
-            '   11 ├───────────┼───────────┤',
-            '   12 │ Item 1    │ Item 2    │',
-            '      └───────────┴───────────┘',
-        })
+        local actual = util.get_actual_marks()
+        util.marks_are_equal(expected, actual)
     end)
 
     it('raw', function()
@@ -149,10 +103,6 @@ describe('table.md', function()
             util.table_pipe(row:get(), 13, false),
             util.link(row:get(), 15, 38, 'web'),
             util.table_pipe(row:get(), 39, false),
-            util.table_pipe(row:increment(), 0, false),
-            util.table_pipe(row:get(), 12, false),
-            util.inline_highlight(row:get(), 14, 24),
-            util.table_pipe(row:get(), 37, false),
         })
 
         vim.list_extend(expected, {
@@ -168,22 +118,8 @@ describe('table.md', function()
             util.table_border(row:get(), false, { 11, 11 }),
         })
 
-        util.assert_view(expected, {
-            '󰫎   1 󰲡 Table with Inline',
-            '    2',
-            '    3 │ Heading 1 │ Heading 2            │',
-            '    4 ├───────────┼───────────────────────━┤',
-            '    5 │ Item 行 │ 󰖟 link │',
-            '    6 │ 1 │ Item 2             │',
-            '    7',
-            '󰫎   8 󰲡 Table no Inline',
-            '    9',
-            '      ┌───────────┬───────────┐',
-            '   10 │ Heading 1 │ Heading 2 │',
-            '   11 ├───────────┼───────────┤',
-            '   12 │ Item 1    │ Item 2    │',
-            '      └───────────┴───────────┘',
-        })
+        local actual = util.get_actual_marks()
+        util.marks_are_equal(expected, actual)
     end)
 
     it('overlay', function()
@@ -216,8 +152,6 @@ describe('table.md', function()
             table_row(row:increment(), 40, '│ `Item 行` │ [link](https://行.com) │', false),
             util.inline_code(row:get(), 2, 12),
             util.link(row:get(), 15, 38, 'web'),
-            table_row(row:increment(), 38, '│ &lt;1&gt; │ ==Item 2==             │', false),
-            util.inline_highlight(row:get(), 14, 24),
             util.table_border(row:get(), false, { 11, 24 }),
         })
 
@@ -230,23 +164,7 @@ describe('table.md', function()
             util.table_border(row:get(), false, { 11, 11 }),
         })
 
-        util.assert_view(expected, {
-            '󰫎   1 󰲡 Table with Inline',
-            '    2',
-            '      ┌───────────┬────────────────────────┐',
-            '    3 │ Heading 1 │ `Heading 2`            │',
-            '    4 ├───────────┼───────────────────────━┤',
-            '    5 │ `Item 行` │ [link](https://行.com) │',
-            '    6 │ &lt;1&gt; │ ==Item 2==             │',
-            '      └───────────┴────────────────────────┘',
-            '    7',
-            '󰫎   8 󰲡 Table no Inline',
-            '    9',
-            '      ┌───────────┬───────────┐',
-            '   10 │ Heading 1 │ Heading 2 │',
-            '   11 ├───────────┼───────────┤',
-            '   12 │ Item 1    │ Item 2    │',
-            '      └───────────┴───────────┘',
-        })
+        local actual = util.get_actual_marks()
+        util.marks_are_equal(expected, actual)
     end)
 end)
