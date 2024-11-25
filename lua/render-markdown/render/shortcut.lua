@@ -22,12 +22,6 @@ function Render:render()
         self:checkbox(checkbox)
         return
     end
-
-    local line = self.node:line('first', 0)
-    if line ~= nil and line:find('[' .. self.node.text .. ']', 1, true) ~= nil then
-        self:wiki_link()
-        return
-    end
 end
 
 ---@private
