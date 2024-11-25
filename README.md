@@ -214,8 +214,9 @@ require('render-markdown').setup({
         -- Turn on / off any sign column related rendering
         sign = true,
         -- Determines how icons fill the available space:
-        --  inline:  underlying '#'s are concealed resulting in a left aligned icon
-        --  overlay: result is left padded with spaces to hide any additional '#'
+        --  right:   '#'s are concealed and icon is appended to right side
+        --  inline:  '#'s are concealed and icon is inlined on left side
+        --  overlay: icon is left padded with spaces and inserted on left hiding any additional '#'
         position = 'overlay',
         -- Replaces '#+' of 'atx_h._marker'
         -- The number of '#' in the heading determines the 'level'
@@ -247,6 +248,7 @@ require('render-markdown').setup({
         -- Can also be a list of integers in which case the 'level' is used to index into the list using a clamp
         min_width = 0,
         -- Determines if a border is added above and below headings
+        -- Can also be a list of booleans in which case the 'level' is used to index into the list using a clamp
         border = false,
         -- Always use virtual lines for heading borders instead of attempting to use empty lines
         border_virtual = false,
@@ -308,6 +310,8 @@ require('render-markdown').setup({
         language_name = true,
         -- A list of language names for which background highlighting will be disabled
         -- Likely because that language has background highlights itself
+        -- Or a boolean to make behavior apply to all languages
+        -- Borders above & below blocks will continue to be rendered
         disable_background = { 'diff' },
         -- Width of the code block background:
         --  block: width of the code block
@@ -532,6 +536,14 @@ require('render-markdown').setup({
         -- Applies to background of sign text
         highlight = 'RenderMarkdownSign',
     },
+    -- Mimics Obsidian inline highlights when content is surrounded by double equals
+    -- The equals on both ends are concealed and the inner content is highlighted
+    inline_highlight = {
+        -- Turn on / off inline highlight rendering
+        enabled = true,
+        -- Applies to background of surrounded text
+        highlight = 'RenderMarkdownInlineHighlight',
+    },
     -- Mimic org-indent-mode behavior by indenting everything under a heading based on the
     -- level of the heading. Indenting starts from level 2 headings onward.
     indent = {
@@ -610,8 +622,9 @@ require('render-markdown').setup({
         -- Turn on / off any sign column related rendering
         sign = true,
         -- Determines how icons fill the available space:
-        --  inline:  underlying '#'s are concealed resulting in a left aligned icon
-        --  overlay: result is left padded with spaces to hide any additional '#'
+        --  right:   '#'s are concealed and icon is appended to right side
+        --  inline:  '#'s are concealed and icon is inlined on left side
+        --  overlay: icon is left padded with spaces and inserted on left hiding any additional '#'
         position = 'overlay',
         -- Replaces '#+' of 'atx_h._marker'
         -- The number of '#' in the heading determines the 'level'
@@ -643,6 +656,7 @@ require('render-markdown').setup({
         -- Can also be a list of integers in which case the 'level' is used to index into the list using a clamp
         min_width = 0,
         -- Determines if a border is added above and below headings
+        -- Can also be a list of booleans in which case the 'level' is used to index into the list using a clamp
         border = false,
         -- Always use virtual lines for heading borders instead of attempting to use empty lines
         border_virtual = false,
@@ -734,6 +748,8 @@ require('render-markdown').setup({
         language_name = true,
         -- A list of language names for which background highlighting will be disabled
         -- Likely because that language has background highlights itself
+        -- Or a boolean to make behavior apply to all languages
+        -- Borders above & below blocks will continue to be rendered
         disable_background = { 'diff' },
         -- Width of the code block background:
         --  block: width of the code block
@@ -1115,40 +1131,41 @@ require('render-markdown').setup({
 
 The table below shows all the highlight groups with their default link
 
-| Highlight Group          | Default Group                      | Description               |
-| ------------------------ | ---------------------------------- | ------------------------- |
-| RenderMarkdownH1         | @markup.heading.1.markdown         | H1 icons                  |
-| RenderMarkdownH2         | @markup.heading.2.markdown         | H2 icons                  |
-| RenderMarkdownH3         | @markup.heading.3.markdown         | H3 icons                  |
-| RenderMarkdownH4         | @markup.heading.4.markdown         | H4 icons                  |
-| RenderMarkdownH5         | @markup.heading.5.markdown         | H5 icons                  |
-| RenderMarkdownH6         | @markup.heading.6.markdown         | H6 icons                  |
-| RenderMarkdownH1Bg       | DiffAdd                            | H1 background line        |
-| RenderMarkdownH2Bg       | DiffChange                         | H2 background line        |
-| RenderMarkdownH3Bg       | DiffDelete                         | H3 background line        |
-| RenderMarkdownH4Bg       | DiffDelete                         | H4 background line        |
-| RenderMarkdownH5Bg       | DiffDelete                         | H5 background line        |
-| RenderMarkdownH6Bg       | DiffDelete                         | H6 background line        |
-| RenderMarkdownCode       | ColorColumn                        | Code block background     |
-| RenderMarkdownCodeInline | RenderMarkdownCode                 | Inline code background    |
-| RenderMarkdownBullet     | Normal                             | List item bullet points   |
-| RenderMarkdownQuote      | @markup.quote                      | Block quote marker        |
-| RenderMarkdownDash       | LineNr                             | Thematic break line       |
-| RenderMarkdownSign       | SignColumn                         | Sign column background    |
-| RenderMarkdownMath       | @markup.math                       | LaTeX lines               |
-| RenderMarkdownLink       | @markup.link.label.markdown_inline | Image & hyperlink icons   |
-| RenderMarkdownWikiLink   | RenderMarkdownLink                 | WikiLink icon & text      |
-| RenderMarkdownUnchecked  | @markup.list.unchecked             | Unchecked checkbox        |
-| RenderMarkdownChecked    | @markup.list.checked               | Checked checkbox          |
-| RenderMarkdownTodo       | @markup.raw                        | Todo custom checkbox      |
-| RenderMarkdownTableHead  | @markup.heading                    | Pipe table heading rows   |
-| RenderMarkdownTableRow   | Normal                             | Pipe table body rows      |
-| RenderMarkdownTableFill  | Conceal                            | Pipe table inline padding |
-| RenderMarkdownSuccess    | DiagnosticOk                       | Success related callouts  |
-| RenderMarkdownInfo       | DiagnosticInfo                     | Info related callouts     |
-| RenderMarkdownHint       | DiagnosticHint                     | Hint related callouts     |
-| RenderMarkdownWarn       | DiagnosticWarn                     | Warning related callouts  |
-| RenderMarkdownError      | DiagnosticError                    | Error related callouts    |
+| Highlight Group               | Default Group                      | Description                |
+| ----------------------------- | ---------------------------------- | -------------------------- |
+| RenderMarkdownH1              | @markup.heading.1.markdown         | H1 icons                   |
+| RenderMarkdownH2              | @markup.heading.2.markdown         | H2 icons                   |
+| RenderMarkdownH3              | @markup.heading.3.markdown         | H3 icons                   |
+| RenderMarkdownH4              | @markup.heading.4.markdown         | H4 icons                   |
+| RenderMarkdownH5              | @markup.heading.5.markdown         | H5 icons                   |
+| RenderMarkdownH6              | @markup.heading.6.markdown         | H6 icons                   |
+| RenderMarkdownH1Bg            | DiffAdd                            | H1 background line         |
+| RenderMarkdownH2Bg            | DiffChange                         | H2 background line         |
+| RenderMarkdownH3Bg            | DiffDelete                         | H3 background line         |
+| RenderMarkdownH4Bg            | DiffDelete                         | H4 background line         |
+| RenderMarkdownH5Bg            | DiffDelete                         | H5 background line         |
+| RenderMarkdownH6Bg            | DiffDelete                         | H6 background line         |
+| RenderMarkdownCode            | ColorColumn                        | Code block background      |
+| RenderMarkdownCodeInline      | RenderMarkdownCode                 | Inline code background     |
+| RenderMarkdownInlineHighlight | RenderMarkdownCodeInline           | Inline highlights contents |
+| RenderMarkdownBullet          | Normal                             | List item bullet points    |
+| RenderMarkdownQuote           | @markup.quote                      | Block quote marker         |
+| RenderMarkdownDash            | LineNr                             | Thematic break line        |
+| RenderMarkdownSign            | SignColumn                         | Sign column background     |
+| RenderMarkdownMath            | @markup.math                       | LaTeX lines                |
+| RenderMarkdownLink            | @markup.link.label.markdown_inline | Image & hyperlink icons    |
+| RenderMarkdownWikiLink        | RenderMarkdownLink                 | WikiLink icon & text       |
+| RenderMarkdownUnchecked       | @markup.list.unchecked             | Unchecked checkbox         |
+| RenderMarkdownChecked         | @markup.list.checked               | Checked checkbox           |
+| RenderMarkdownTodo            | @markup.raw                        | Todo custom checkbox       |
+| RenderMarkdownTableHead       | @markup.heading                    | Pipe table heading rows    |
+| RenderMarkdownTableRow        | Normal                             | Pipe table body rows       |
+| RenderMarkdownTableFill       | Conceal                            | Pipe table inline padding  |
+| RenderMarkdownSuccess         | DiagnosticOk                       | Success related callouts   |
+| RenderMarkdownInfo            | DiagnosticInfo                     | Info related callouts      |
+| RenderMarkdownHint            | DiagnosticHint                     | Hint related callouts      |
+| RenderMarkdownWarn            | DiagnosticWarn                     | Warning related callouts   |
+| RenderMarkdownError           | DiagnosticError                    | Error related callouts     |
 
 # Info
 

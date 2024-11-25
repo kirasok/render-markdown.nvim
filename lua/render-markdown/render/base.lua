@@ -55,9 +55,7 @@ function Base:checkbox_scope(paragraph, highlight)
     if paragraph == nil then
         return
     end
-    self.marks:add('check_scope', paragraph.start_row, paragraph.start_col, {
-        end_row = paragraph.end_row,
-        end_col = paragraph.end_col,
+    self.marks:add_over('check_scope', paragraph, {
         hl_group = highlight,
     })
 end
@@ -83,7 +81,7 @@ end
 function Base:indent_virt_line(line, level)
     local amount = self:indent(level)
     if amount > 0 then
-        table.insert(line, 1, { Str.pad(amount), self.config.padding.highlight })
+        table.insert(line, 1, self:padding_text(amount))
     end
     return line
 end
@@ -107,6 +105,14 @@ function Base:indent(level)
         return 0
     end
     return indent.per_level * level
+end
+
+---@protected
+---@param width integer
+---@param highlight? string
+---@return { [1]: string, [2]: string }
+function Base:padding_text(width, highlight)
+    return { Str.pad(width), highlight or self.config.padding.highlight }
 end
 
 return Base

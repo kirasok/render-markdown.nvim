@@ -30,7 +30,7 @@ function Render:setup()
         -- cases in the parser: https://github.com/tree-sitter-grammars/tree-sitter-markdown/issues/127
         -- As a result we account for leading spaces here, can remove if this gets fixed upstream
         spaces = Str.spaces('start', marker.text),
-        checkbox = self.context:get_checkbox(self.node),
+        checkbox = self.context:get_checkbox(self.node.start_row),
     }
 
     return true
@@ -71,12 +71,9 @@ end
 
 ---@private
 function Render:hide_marker()
-    local node = self.data.marker
-    self.marks:add('check_icon', node.start_row, node.start_col + self.data.spaces, {
-        end_row = node.end_row,
-        end_col = node.end_col,
+    self.marks:add_over('check_icon', self.data.marker, {
         conceal = '',
-    })
+    }, { 0, self.data.spaces, 0, 0 })
 end
 
 ---@private
@@ -104,9 +101,7 @@ function Render:icon(level)
     if Str.width(text) > Str.width(node.text) then
         position, conceal = 'inline', ''
     end
-    self.marks:add('bullet', node.start_row, node.start_col, {
-        end_row = node.end_row,
-        end_col = node.end_col,
+    self.marks:add_over('bullet', node, {
         virt_text = { { text, self.bullet.highlight } },
         virt_text_pos = position,
         conceal = conceal,
@@ -139,7 +134,7 @@ function Render:padding_mark(row, col, amount)
     if amount > 0 then
         self.marks:add(false, row, col, {
             priority = 0,
-            virt_text = { { Str.pad(amount), self.config.padding.highlight } },
+            virt_text = { self:padding_text(amount) },
             virt_text_pos = 'inline',
         })
     end
