@@ -30,7 +30,7 @@ function M.setup()
             end
             for _, win in ipairs(vim.v.event.windows) do
                 local buf = vim.fn.winbufnr(win)
-                if vim.tbl_contains(buffers, buf) then
+                if M.is_attached(buf) then
                     ui.update(buf, win, args.event, true)
                 end
             end
@@ -46,6 +46,12 @@ function M.set_all(enabled)
     for _, buf in ipairs(buffers) do
         ui.update(buf, vim.fn.bufwinid(buf), 'UserCommand', true)
     end
+end
+
+---@param buf integer
+---@return boolean
+function M.is_attached(buf)
+    return vim.tbl_contains(buffers, buf)
 end
 
 ---@private
@@ -73,6 +79,9 @@ function M.attach(buf)
             end
             local win, windows = util.current('win'), util.windows(buf)
             win = vim.tbl_contains(windows, win) and win or windows[1]
+            if win == nil then
+                return
+            end
             local event = args.event
             ui.update(buf, win, event, vim.tbl_contains(change_events, event))
         end,
@@ -85,7 +94,7 @@ end
 function M.should_attach(buf)
     log.buf('info', 'attach', buf, 'start')
 
-    if vim.tbl_contains(buffers, buf) then
+    if M.is_attached(buf) then
         log.buf('info', 'attach', buf, 'skip', 'already attached')
         return false
     end

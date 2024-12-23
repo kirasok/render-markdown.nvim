@@ -53,6 +53,8 @@ Plugin to improve viewing Markdown files in Neovim
     Used to parse `markdown` files
   - [latex](https://github.com/latex-lsp/tree-sitter-latex) (Optional):
     Used to get `LaTeX` blocks from `markdown` files
+  - [html](https://github.com/tree-sitter/tree-sitter-html) (Optional):
+    Used to conceal `HTML` comments
 - Icon provider plugin (Optional): Used for icon above code blocks
   - [mini.icons](https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-icons.md)
   - [nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons)
@@ -113,6 +115,43 @@ use({
 | `:RenderMarkdown debug`    | `require('render-markdown').debug()`    | Prints information about marks on current line    |
 | `:RenderMarkdown config`   | `require('render-markdown').config()`   | Prints difference between config and default      |
 
+# Completions
+
+This plugin provides completions for both checkboxes and callouts provided you follow
+the relevant setup.
+
+## nvim-cmp
+
+```lua
+local cmp = require('cmp')
+cmp.setup({
+    sources = cmp.config.sources({
+        { name = 'render-markdown' },
+    }),
+})
+```
+
+## blink.cmp
+
+```lua
+require('blink.cmp').setup({
+    sources = {
+        completion = {
+            enabled_providers = { 'lsp', 'path', 'snippets', 'buffer', 'markdown' },
+        },
+        providers = {
+            markdown = { name = 'RenderMarkdown', module = 'render-markdown.integ.blink' },
+        },
+    },
+})
+```
+
+## coq_nvim
+
+```lua
+require('render-markdown.integ.coq').setup()
+```
+
 # Setup
 
 Checkout the [Wiki](https://github.com/MeanderingProgrammer/render-markdown.nvim/wiki)
@@ -166,9 +205,9 @@ require('render-markdown').setup({
             ]],
         },
     },
-    -- Vim modes that will show a rendered view of the markdown file
+    -- Vim modes that will show a rendered view of the markdown file, :h mode()
     -- All other modes will be unaffected by this plugin
-    render_modes = { 'n', 'c' },
+    render_modes = { 'n', 'c', 't' },
     anti_conceal = {
         -- This enables hiding any added text on the line the cursor is on
         enabled = true,
@@ -205,6 +244,8 @@ require('render-markdown').setup({
     on = {
         -- Called when plugin initially attaches to a buffer
         attach = function() end,
+        -- Called after plugin renders a buffer
+        render = function() end,
     },
     heading = {
         -- Turn on / off heading icon & background rendering
@@ -328,6 +369,7 @@ require('render-markdown').setup({
         -- Minimum width to use for code blocks when width is 'block'
         min_width = 0,
         -- Determines how the top / bottom of code block are rendered:
+        --  none:  do not render a border
         --  thick: use the same highlight as the code body
         --  thin:  when lines are empty overlay the above & below icons
         border = 'thin',
@@ -359,14 +401,22 @@ require('render-markdown').setup({
         -- Turn on / off list bullet rendering
         enabled = true,
         -- Replaces '-'|'+'|'*' of 'list_item'
-        -- How deeply nested the list is determines the 'level' which is used to index into the list using a cycle
-        -- The item number in the list is used to index into the value using a clamp if the value is also a list
+        -- How deeply nested the list is determines the 'level', how far down at that level determines the 'index'
+        -- If a function is provided both of these values are passed in using 1 based indexing
+        -- If a list is provided we index into it using a cycle based on the level
+        -- If the value at that level is also a list we further index into it using a clamp based on the index
         -- If the item is a 'checkbox' a conceal is used to hide the bullet instead
         icons = { '●', '○', '◆', '◇' },
         -- Replaces 'n.'|'n)' of 'list_item'
-        -- How deeply nested the list is determines the 'level' which is used to index into the list using a cycle
-        -- The item number in the list is used to index into the value using a clamp if the value is also a list
-        ordered_icons = {},
+        -- How deeply nested the list is determines the 'level', how far down at that level determines the 'index'
+        -- If a function is provided both of these values are passed in using 1 based indexing
+        -- If a list is provided we index into it using a cycle based on the level
+        -- If the value at that level is also a list we further index into it using a clamp based on the index
+        ordered_icons = function(level, index, value)
+            value = vim.trim(value)
+            local value_index = tonumber(value:sub(1, #value - 1))
+            return string.format('%d.', value_index > 1 and value_index or index)
+        end,
         -- Padding to add to the left of bullet point
         left_pad = 0,
         -- Padding to add to the right of bullet point
@@ -507,25 +557,41 @@ require('render-markdown').setup({
     link = {
         -- Turn on / off inline link icon rendering
         enabled = true,
+        -- How to handle footnote links, start with a '^'
+        footnote = {
+            -- Replace value with superscript equivalent
+            superscript = true,
+            -- Added before link content when converting to superscript
+            prefix = '',
+            -- Added after link content when converting to superscript
+            suffix = '',
+        },
         -- Inlined with 'image' elements
         image = '󰥶 ',
         -- Inlined with 'email_autolink' elements
         email = '󰀓 ',
-        -- Fallback icon for 'inline_link' elements
+        -- Fallback icon for 'inline_link' and 'uri_autolink' elements
         hyperlink = '󰌹 ',
-        -- Applies to the fallback inlined icon
+        -- Applies to the inlined icon as a fallback
         highlight = 'RenderMarkdownLink',
         -- Applies to WikiLink elements
         wiki = { icon = '󱗖 ', highlight = 'RenderMarkdownWikiLink' },
         -- Define custom destination patterns so icons can quickly inform you of what a link
-        -- contains. Applies to 'inline_link' and wikilink nodes.
+        -- contains. Applies to 'inline_link', 'uri_autolink', and wikilink nodes. When multiple
+        -- patterns match a link the one with the longer pattern is used.
         -- Can specify as many additional values as you like following the 'web' pattern below
         --   The key in this case 'web' is for healthcheck and to allow users to change its values
         --   'pattern':   Matched against the destination text see :h lua-pattern
         --   'icon':      Gets inlined before the link text
-        --   'highlight': Highlight for the 'icon'
+        --   'highlight': Optional highlight for the 'icon', uses fallback highlight if not provided
         custom = {
-            web = { pattern = '^http[s]?://', icon = '󰖟 ', highlight = 'RenderMarkdownLink' },
+            web = { pattern = '^http', icon = '󰖟 ' },
+            youtube = { pattern = 'youtube%.com', icon = '󰗃 ' },
+            github = { pattern = 'github%.com', icon = '󰊤 ' },
+            neovim = { pattern = 'neovim%.io', icon = ' ' },
+            stackoverflow = { pattern = 'stackoverflow%.com', icon = '󰓌 ' },
+            discord = { pattern = 'discord%.com', icon = '󰙯 ' },
+            reddit = { pattern = 'reddit%.com', icon = '󰑍 ' },
         },
     },
     sign = {
@@ -555,6 +621,18 @@ require('render-markdown').setup({
         -- Do not indent heading titles, only the body
         skip_heading = false,
     },
+    html = {
+        -- Turn on / off all HTML rendering
+        enabled = true,
+        comment = {
+            -- Turn on / off HTML comment concealing
+            conceal = true,
+            -- Optional text to inline before the concealed comment
+            text = nil,
+            -- Highlight for the inlined text
+            highlight = 'RenderMarkdownHtmlComment',
+        },
+    },
     -- Window options to use that change between rendered and raw view
     win_options = {
         -- See :h 'conceallevel'
@@ -577,7 +655,7 @@ require('render-markdown').setup({
     -- if no override is provided. Supports the following fields:
     --   enabled, max_file_size, debounce, render_modes, anti_conceal, padding,
     --   heading, paragraph, code, dash, bullet, checkbox, quote, pipe_table,
-    --   callout, link, sign, indent, win_options
+    --   callout, link, sign, indent, html, win_options
     overrides = {
         -- Overrides for different buftypes, see :h 'buftype'
         buftype = {
@@ -766,6 +844,7 @@ require('render-markdown').setup({
         -- Minimum width to use for code blocks when width is 'block'
         min_width = 0,
         -- Determines how the top / bottom of code block are rendered:
+        --  none:  do not render a border
         --  thick: use the same highlight as the code body
         --  thin:  when lines are empty overlay the above & below icons
         border = 'thin',
@@ -827,14 +906,22 @@ require('render-markdown').setup({
         -- Turn on / off list bullet rendering
         enabled = true,
         -- Replaces '-'|'+'|'*' of 'list_item'
-        -- How deeply nested the list is determines the 'level' which is used to index into the list using a cycle
-        -- The item number in the list is used to index into the value using a clamp if the value is also a list
+        -- How deeply nested the list is determines the 'level', how far down at that level determines the 'index'
+        -- If a function is provided both of these values are passed in using 1 based indexing
+        -- If a list is provided we index into it using a cycle based on the level
+        -- If the value at that level is also a list we further index into it using a clamp based on the index
         -- If the item is a 'checkbox' a conceal is used to hide the bullet instead
         icons = { '●', '○', '◆', '◇' },
         -- Replaces 'n.'|'n)' of 'list_item'
-        -- How deeply nested the list is determines the 'level' which is used to index into the list using a cycle
-        -- The item number in the list is used to index into the value using a clamp if the value is also a list
-        ordered_icons = {},
+        -- How deeply nested the list is determines the 'level', how far down at that level determines the 'index'
+        -- If a function is provided both of these values are passed in using 1 based indexing
+        -- If a list is provided we index into it using a cycle based on the level
+        -- If the value at that level is also a list we further index into it using a clamp based on the index
+        ordered_icons = function(level, index, value)
+            value = vim.trim(value)
+            local value_index = tonumber(value:sub(1, #value - 1))
+            return string.format('%d.', value_index > 1 and value_index or index)
+        end,
         -- Padding to add to the left of bullet point
         left_pad = 0,
         -- Padding to add to the right of bullet point
@@ -1050,25 +1137,41 @@ require('render-markdown').setup({
     link = {
         -- Turn on / off inline link icon rendering
         enabled = true,
+        -- How to handle footnote links, start with a '^'
+        footnote = {
+            -- Replace value with superscript equivalent
+            superscript = true,
+            -- Added before link content when converting to superscript
+            prefix = '',
+            -- Added after link content when converting to superscript
+            suffix = '',
+        },
         -- Inlined with 'image' elements
         image = '󰥶 ',
         -- Inlined with 'email_autolink' elements
         email = '󰀓 ',
-        -- Fallback icon for 'inline_link' elements
+        -- Fallback icon for 'inline_link' and 'uri_autolink' elements
         hyperlink = '󰌹 ',
-        -- Applies to the fallback inlined icon
+        -- Applies to the inlined icon as a fallback
         highlight = 'RenderMarkdownLink',
         -- Applies to WikiLink elements
         wiki = { icon = '󱗖 ', highlight = 'RenderMarkdownWikiLink' },
         -- Define custom destination patterns so icons can quickly inform you of what a link
-        -- contains. Applies to 'inline_link' and wikilink nodes.
+        -- contains. Applies to 'inline_link', 'uri_autolink', and wikilink nodes. When multiple
+        -- patterns match a link the one with the longer pattern is used.
         -- Can specify as many additional values as you like following the 'web' pattern below
         --   The key in this case 'web' is for healthcheck and to allow users to change its values
         --   'pattern':   Matched against the destination text see :h lua-pattern
         --   'icon':      Gets inlined before the link text
-        --   'highlight': Highlight for the 'icon'
+        --   'highlight': Optional highlight for the 'icon', uses fallback highlight if not provided
         custom = {
-            web = { pattern = '^http[s]?://', icon = '󰖟 ', highlight = 'RenderMarkdownLink' },
+            web = { pattern = '^http', icon = '󰖟 ' },
+            youtube = { pattern = 'youtube%.com', icon = '󰗃 ' },
+            github = { pattern = 'github%.com', icon = '󰊤 ' },
+            neovim = { pattern = 'neovim%.io', icon = ' ' },
+            stackoverflow = { pattern = 'stackoverflow%.com', icon = '󰓌 ' },
+            discord = { pattern = 'discord%.com', icon = '󰙯 ' },
+            reddit = { pattern = 'reddit%.com', icon = '󰑍 ' },
         },
     },
 })
@@ -1151,6 +1254,7 @@ The table below shows all the highlight groups with their default link
 | RenderMarkdownDash            | LineNr                             | Thematic break line        |
 | RenderMarkdownSign            | SignColumn                         | Sign column background     |
 | RenderMarkdownMath            | @markup.math                       | LaTeX lines                |
+| RenderMarkdownHtmlComment     | @comment                           | HTML comment inline text   |
 | RenderMarkdownLink            | @markup.link.label.markdown_inline | Image & hyperlink icons    |
 | RenderMarkdownWikiLink        | RenderMarkdownLink                 | WikiLink icon & text       |
 | RenderMarkdownUnchecked       | @markup.list.unchecked             | Unchecked checkbox         |

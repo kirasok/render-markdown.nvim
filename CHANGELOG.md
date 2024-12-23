@@ -4,6 +4,59 @@
 
 ### Features
 
+- nvim-cmp completion source [3d2dc15](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/3d2dc15542e56671dd14dfbfff63434ec21d8fcd)
+- blink.cmp completion source [3d2dc15](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/3d2dc15542e56671dd14dfbfff63434ec21d8fcd)
+- coq_nvim completion source [#258](https://github.com/MeanderingProgrammer/render-markdown.nvim/pull/258)
+  [75cdf9d](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/75cdf9d2b049f0e27440bd78cc52b39acd15cd6e)
+
+### Bug Fixes
+
+- nil check for window [#257](https://github.com/MeanderingProgrammer/render-markdown.nvim/pull/257)
+  [eb8fdac](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/eb8fdace39e6eab96037539aace272f14e40fd80)
+
+### Collaborator Shoutouts
+
+- @argizuno
+- @TheLeoP
+
+## 7.7.0 (2024-12-07)
+
+### Features
+
+- footnote text superscript rendering [#241](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/241)
+  [634acd5](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/634acd5da964c32f6947cd0c7802d7a116662665)
+  [1b5d117](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/1b5d11734122d9451d2e5e2e567fd61a62822293)
+- code border none [#246](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/246)
+  [f3cda24](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/f3cda24c71261f6a52f5ddafb95786684d862d87)
+- expand default custom links [#245](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/245)
+  [61850bf](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/61850bf7df4af8398e97559a35b62378ba8435b1)
+- bare URLs in angle brackets [#244](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/244)
+  [401a6c9](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/401a6c9c4cf39e22b8487503dd7dfe37fc7fb064)
+  [b6b903c](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/b6b903cc09df1441602fc04665fb12cef576a914)
+- conceal html comments [#244](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/244)
+  [558310a](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/558310ae07b7bf0dffc478160513bb5c845f263c)
+  [7674543](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/7674543331701d05dc9f878e1fe62d1107dc2f5e)
+- after render callback [#248](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/248)
+  [c89e5e0](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/c89e5e0719d07e1e2c0d3942b564ac916b6ffe9c)
+- ordered list auto indexing [#250](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/250)
+  [a7097f3](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/a7097f372ba8f8866cda5e98d5bc828f2856c96c)
+  [#254](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/254)
+  [4ac2804](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/4ac28048b492d351b70ded7b58d3f1a816e6c0a2)
+
+### Bug Fixes
+
+- highlight index width calculation [#212](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/212)
+  [3a319cd](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/3a319cdbefebf0079a7012dab6b1bfc18ca5b97f)
+
+### Awesome Things
+
+- fzf-lua integration [#1546](https://github.com/ibhagwan/fzf-lua/discussions/1546)
+  [da70762](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/da707623447752ca8eb00b7606b8ffe7dac18ce0)
+
+## 7.6.0 (2024-11-25)
+
+### Features
+
 - disabling background for code now keeps border [#220](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/220)
   [bee16b2](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/bee16b21bf47b64ceda8c9bb281d4b576d329c0f)
 - table support for all conceal levels [3da1bfc](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/3da1bfc4bd3a13fee57551f0b705ebcf2614d7a2)
@@ -12,11 +65,19 @@
   [78a2eb7](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/78a2eb7fc273f36790aa390262f390a3265eedff)
 - log_level off [#235](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/235)
   [48a52dd](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/48a52dd5c847c59eac6ae5b96ff0123acd1a394d)
+- highlighting in double equals [d6a82d7](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/d6a82d70765aa238b7ea48d257a1d57a92501423)
+- heading border per level [#240](https://github.com/MeanderingProgrammer/render-markdown.nvim/discussions/240)
+  [c83fc56](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/c83fc5694cd19c576af188f5f3313513bf467272)
+- heading position right [#238](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/238)
+  [e1879e0](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/e1879e0ea3d5cee295b48335fc90e76ae8a63081)
 
 ### Bug Fixes
 
 - padding & margin for code blocks indented with tabs [#230](https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/230)
   [d80acb3](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/d80acb3f4ccc88052f65fa0a26e46c106b328bbe)
+- check table rows after parsing [7f0143e](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/7f0143e9adf7140c8e3fa33a5bdf193d7a8f0429)
+- conceal level 2 entities in tables [430a671](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/430a671655ac84a63f41cd3e940caebdd0a99434)
+- ignore anti conceal for inline heading icons [017f370](https://github.com/MeanderingProgrammer/render-markdown.nvim/commit/017f370369f205b02331838b56c4a68eef0b317d)
 
 ## 7.5.0 (2024-11-04)
 

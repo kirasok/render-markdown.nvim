@@ -1,25 +1,34 @@
 local Base = require('render-markdown.render.base')
+local Converter = require('render-markdown.lib.converter')
 local Str = require('render-markdown.lib.str')
 
 ---@class render.md.render.Shortcut: render.md.Renderer
+---@field private link render.md.Link
 local Render = setmetatable({}, Base)
 Render.__index = Render
 
 ---@return boolean
 function Render:setup()
+    self.link = self.config.link
     return true
 end
 
 function Render:render()
-    local callout = self.config.component.callout[self.node.text:lower()]
+    local callout = self.config:get_callout(self.node)
     if callout ~= nil then
         self:callout(callout)
         return
     end
 
-    local checkbox = self.config.component.checkbox[self.node.text:lower()]
+    local checkbox = self.config:get_checkbox(self.node)
     if checkbox ~= nil then
         self:checkbox(checkbox)
+        return
+    end
+
+    local _, _, text = self.node.text:find('^%[%^(.+)%]$')
+    if text ~= nil then
+        self:footnote(text)
         return
     end
 end
@@ -79,22 +88,37 @@ end
 
 ---@private
 function Render:wiki_link()
-    if not self.config.link.enabled then
+    if not self.link.enabled then
         return
     end
 
     local parts = Str.split(self.node.text:sub(2, -2), '|')
-    local link_component = self:link_component(parts[1])
-    local icon, highlight = self.config.link.wiki.icon, self.config.link.wiki.highlight
-    if link_component ~= nil then
-        icon, highlight = link_component.icon, link_component.highlight
-    end
-    local link_text = icon .. parts[#parts]
+    local icon, highlight = self:from_destination(self.link.wiki.icon, self.link.wiki.highlight, parts[1])
     self.marks:add_over('link', self.node, {
-        virt_text = { { link_text, highlight } },
+        virt_text = { { icon .. parts[#parts], highlight } },
         virt_text_pos = 'inline',
         conceal = '',
     }, { 0, -1, 0, 1 })
+end
+
+---@private
+---@param text string
+function Render:footnote(text)
+    local footnote = self.link.footnote
+    if not self.link.enabled or not footnote.superscript then
+        return
+    end
+
+    local value = Converter.to_superscript(footnote.prefix .. text .. footnote.suffix)
+    if value == nil then
+        return
+    end
+
+    self.marks:add_over('link', self.node, {
+        virt_text = { { value, self.link.highlight } },
+        virt_text_pos = 'inline',
+        conceal = '',
+    })
 end
 
 return Render

@@ -30,32 +30,40 @@ local function setext_heading(start_row, end_row, level)
 end
 
 ---@param row integer
----@param length integer
----@param link_text string
+---@param start_col integer
+---@param end_col integer
+---@param text string
 ---@param highlight 'Link'|'WikiLink'
----@param conceal string?
----@return render.md.MarkInfo[]
-local function bullet_link(row, length, link_text, highlight, conceal)
+---@param conceal? string
+---@return render.md.MarkInfo
+local function link(row, start_col, end_col, text, highlight, conceal)
     ---@type render.md.MarkInfo
-    local link = {
+    return {
         row = { row, row },
-        col = { 2, 2 + length },
-        virt_text = { { link_text, util.hl(highlight) } },
+        col = { start_col, end_col },
+        virt_text = { { text, util.hl(highlight) } },
         virt_text_pos = 'inline',
         conceal = conceal,
     }
-    return { util.bullet(row, 0, 1), link }
+end
+
+---@param row integer
+---@param start_col integer
+---@param end_col integer
+---@param icon string
+---@return render.md.MarkInfo[]
+local function auto_link(row, start_col, end_col, icon)
+    return {
+        util.conceal(row, start_col, start_col + 1),
+        link(row, start_col, end_col, icon, 'Link', nil),
+        util.highlight(row, start_col, end_col, 'Link'),
+        util.conceal(row, end_col - 1, end_col),
+    }
 end
 
 describe('ad_hoc.md', function()
     it('custom', function()
-        util.setup('tests/data/ad_hoc.md', {
-            link = {
-                custom = {
-                    youtube = { pattern = 'www%.youtube%.com/', icon = ' ', highlight = util.hl('Link') },
-                },
-            },
-        })
+        util.setup('tests/data/ad_hoc.md')
 
         local expected, row = {}, util.row()
 
@@ -63,12 +71,38 @@ describe('ad_hoc.md', function()
 
         vim.list_extend(expected, setext_heading(row:increment(2), row:increment(2), 2))
 
+        vim.list_extend(expected, { util.bullet(row:increment(2), 0, 1) })
+
         vim.list_extend(expected, {
-            util.bullet(row:increment(2), 0, 1),
-            bullet_link(row:increment(), 13, '󱗖 Basic One', 'WikiLink', ''),
-            bullet_link(row:increment(), 23, '󱗖 With Alias', 'WikiLink', ''),
-            bullet_link(row:increment(), 18, '󰀓 test@example.com', 'Link', ''),
-            bullet_link(row:increment(), 59, ' ', 'Link', nil),
+            util.bullet(row:increment(), 0, 1),
+            link(row:get(), 2, 15, '󱗖 Basic One', 'WikiLink', ''),
+        })
+
+        vim.list_extend(expected, {
+            util.bullet(row:increment(), 0, 1),
+            link(row:get(), 2, 25, '󱗖 With Alias', 'WikiLink', ''),
+        })
+
+        vim.list_extend(expected, {
+            util.bullet(row:increment(), 0, 1),
+            auto_link(row:get(), 2, 20, '󰀓 '),
+        })
+
+        vim.list_extend(expected, {
+            util.bullet(row:increment(), 0, 1),
+            auto_link(row:get(), 2, 26, '󰊤 '),
+        })
+
+        vim.list_extend(expected, {
+            util.bullet(row:increment(), 0, 1),
+            link(row:get(), 2, 61, '󰗃 ', 'Link', nil),
+        })
+
+        vim.list_extend(expected, {
+            util.bullet(row:increment(), 0, 1),
+            link(row:get(), 16, 25, '¹ ᴵⁿᶠᵒ', 'Link', ''),
+            util.conceal(row:increment(2), 0, 16),
+            link(row:increment(2), 0, 9, '¹ ᴵⁿᶠᵒ', 'Link', ''),
         })
 
         util.assert_view(expected, {
@@ -82,7 +116,13 @@ describe('ad_hoc.md', function()
             '    8 ● 󱗖 Basic One Then normal text',
             '    9 ● 󱗖 With Alias Something important',
             '   10 ● 󰀓 test@example.com Email',
-            '   11 ●  Youtube Link',
+            '   11 ● 󰊤 http://www.github.com/ Bare URL',
+            '   12 ● 󰗃 Youtube Link',
+            '   13 ● Footnote Link ¹ ᴵⁿᶠᵒ',
+            '   14',
+            '   15',
+            '   16',
+            '   17 ¹ ᴵⁿᶠᵒ: Some Info',
         })
     end)
 end)
