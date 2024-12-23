@@ -27,9 +27,18 @@ function Render:render()
     end
 
     local line = self.node:line('first', 0)
-    if line ~= nil and line:find('[' .. self.node.text .. ']', 1, true) ~= nil then
-        self:wiki_link()
-        return
+    if line ~= nil then
+        local i, j = line:find('[' .. self.node.text .. ']', 1, true)
+        if i ~= nil and j ~= nil then
+            local left, right
+            if line:sub(i - 1, i - 1) == '#' then
+                left = ' '
+            elseif line:sub(j + 1, j + 1) == '#' then
+                right = ' '
+            end
+            self:wiki_link(left, right)
+            return
+        end
     end
 
     local _, _, text = self.node.text:find('^%[%^(.+)%]$')
@@ -93,18 +102,43 @@ function Render:checkbox(checkbox)
 end
 
 ---@private
-function Render:wiki_link()
+function Render:wiki_link(left, right)
     if not self.link.enabled then
         return
     end
 
+    local function get_from_diagnostics()
+        local buf = self.node.buf
+        local col = self.node.start_col - 1
+        local row = self.node.start_row
+        local diagnostic = vim.diagnostic.get(buf)
+        for _, value in pairs(diagnostic) do
+            if value['severity'] == vim.diagnostic.severity.HINT and value['col'] == col and value['lnum'] == row then
+                return value['message']
+            end
+        end
+        return nil
+    end
+
     local parts = Str.split(self.node.text:sub(2, -2), '|')
-    local icon, highlight = self:from_destination(self.link.wiki.icon, self.link.wiki.highlight, parts[1])
+    local icon, highlight =
+        self:from_destination(left or right or self.link.wiki.icon, self.link.wiki.highlight, parts[1])
+    local title = parts[#parts]
+    if #parts == 1 then
+        title = get_from_diagnostics() or title
+    end
+    local offset = { 0, -1, 0, 1 }
+    if left then
+        offset[2] = -2
+    end
+    if right then
+        offset[4] = 2
+    end
     self.marks:add_over('link', self.node, {
-        virt_text = { { icon .. parts[#parts], highlight } },
+        virt_text = { { icon .. title, highlight } },
         virt_text_pos = 'inline',
         conceal = '',
-    }, { 0, -1, 0, 1 })
+    }, offset)
 end
 
 ---@private
