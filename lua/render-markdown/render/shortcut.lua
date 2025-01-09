@@ -51,7 +51,7 @@ end
 ---@private
 ---@param callout render.md.CustomCallout
 function Render:callout(callout)
-    if not self.config.quote.enabled then
+    if self.context:skip(self.config.quote) then
         return
     end
 
@@ -84,7 +84,7 @@ end
 ---@private
 ---@param checkbox render.md.CustomCheckbox
 function Render:checkbox(checkbox)
-    if not self.config.checkbox.enabled then
+    if self.context:skip(self.config.checkbox) then
         return
     end
 
@@ -103,9 +103,13 @@ end
 
 ---@private
 function Render:wiki_link(left, right)
-    if not self.link.enabled then
+    if self.context:skip(self.link) then
         return
     end
+
+    local wiki = self.link.wiki
+    local start_col, end_col = self.node.start_col, self.node.end_col
+    local values = Str.split(self.node.text:sub(2, -2), '|')
 
     local function get_from_diagnostics()
         local buf = self.node.buf
@@ -120,32 +124,49 @@ function Render:wiki_link(left, right)
         return nil
     end
 
-    local parts = Str.split(self.node.text:sub(2, -2), '|')
-    local icon, highlight =
-        self:from_destination(left or right or self.link.wiki.icon, self.link.wiki.highlight, parts[1])
-    local title = parts[#parts]
-    if #parts == 1 then
+    -- Add icon
+    local icon, highlight = self:from_destination(left or right or wiki.icon, wiki.highlight, values[1])
+
+    -- Fetch titles
+    local title = values[#values]
+    if #values == 1 then
         title = get_from_diagnostics() or title
     end
-    local offset = { 0, -1, 0, 1 }
-    if left then
-        offset[2] = -2
-    end
-    if right then
-        offset[4] = 2
-    end
+
     self.marks:add_over('link', self.node, {
         virt_text = { { icon .. title, highlight } },
         virt_text_pos = 'inline',
+    })
+
+    if left then
+        start_col = start_col - 1
+    end
+    if right then
+        end_col = end_col + 1
+    end
+
+    self:hide(start_col - 1, end_col + 1)
+end
+
+---@private
+---@param start_col integer
+---@param end_col integer
+function Render:hide(start_col, end_col)
+    self.marks:add(true, self.node.start_row, start_col, {
+        end_col = end_col,
         conceal = '',
-    }, offset)
+    })
 end
 
 ---@private
 ---@param text string
 function Render:footnote(text)
+    if self.context:skip(self.link) then
+        return
+    end
+
     local footnote = self.link.footnote
-    if not self.link.enabled or not footnote.superscript then
+    if not footnote.superscript then
         return
     end
 

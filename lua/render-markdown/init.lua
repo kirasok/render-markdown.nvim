@@ -15,13 +15,6 @@ local M = {}
 ---@field public attach? fun(buf: integer)
 ---@field public render? fun(buf: integer)
 
----@class (exact) render.md.UserLatex
----@field public enabled? boolean
----@field public converter? string
----@field public highlight? string
----@field public top_pad? integer
----@field public bottom_pad? integer
-
 ---@class (exact) render.md.UserInjection
 ---@field public enabled? boolean
 ---@field public query? string
@@ -32,23 +25,30 @@ local M = {}
 ---@field public default? render.md.option.Value
 ---@field public rendered? render.md.option.Value
 
+---@class (exact) render.md.UserBaseComponent
+---@field public enabled? boolean
+---@field public render_modes? render.md.Modes
+
 ---@class (exact) render.md.UserHtmlComment
 ---@field public conceal? boolean
 ---@field public text? string
 ---@field public highlight? string
 
----@class (exact) render.md.UserHtml
----@field public enabled? boolean
+---@class (exact) render.md.UserHtml: render.md.UserBaseComponent
 ---@field public comment? render.md.UserHtmlComment
 
----@class (exact) render.md.UserIndent
----@field public enabled? boolean
+---@class (exact) render.md.UserLatex: render.md.UserBaseComponent
+---@field public converter? string
+---@field public highlight? string
+---@field public top_pad? integer
+---@field public bottom_pad? integer
+
+---@class (exact) render.md.UserIndent: render.md.UserBaseComponent
 ---@field public per_level? integer
 ---@field public skip_level? integer
 ---@field public skip_heading? boolean
 
----@class (exact) render.md.UserInlineHighlight
----@field public enabled? boolean
+---@class (exact) render.md.UserInlineHighlight: render.md.UserBaseComponent
 ---@field public highlight? string
 
 ---@class (exact) render.md.UserSign
@@ -69,8 +69,7 @@ local M = {}
 ---@field public prefix? string
 ---@field public suffix? string
 
----@class (exact) render.md.UserLink
----@field public enabled? boolean
+---@class (exact) render.md.UserLink: render.md.UserBaseComponent
 ---@field public footnote? render.md.UserFootnote
 ---@field public image? string
 ---@field public email? string
@@ -89,8 +88,7 @@ local M = {}
 ---@alias render.md.table.Style 'full'|'normal'|'none'
 ---@alias render.md.table.Cell 'trimmed'|'padded'|'raw'|'overlay'
 
----@class (exact) render.md.UserPipeTable
----@field public enabled? boolean
+---@class (exact) render.md.UserPipeTable: render.md.UserBaseComponent
 ---@field public preset? render.md.table.Preset
 ---@field public style? render.md.table.Style
 ---@field public cell? render.md.table.Cell
@@ -102,8 +100,7 @@ local M = {}
 ---@field public row? string
 ---@field public filler? string
 
----@class (exact) render.md.UserQuote
----@field public enabled? boolean
+---@class (exact) render.md.UserQuote: render.md.UserBaseComponent
 ---@field public icon? string
 ---@field public repeat_linebreak? boolean
 ---@field public highlight? string
@@ -121,8 +118,7 @@ local M = {}
 
 ---@alias render.md.checkbox.Position 'overlay'|'inline'
 
----@class (exact) render.md.UserCheckbox
----@field public enabled? boolean
+---@class (exact) render.md.UserCheckbox: render.md.UserBaseComponent
 ---@field public position? render.md.checkbox.Position
 ---@field public unchecked? render.md.UserCheckboxComponent
 ---@field public checked? render.md.UserCheckboxComponent
@@ -133,18 +129,17 @@ local M = {}
 ---| string[][]
 ---| fun(level: integer, index: integer, value: string): string?
 
----@class (exact) render.md.UserBullet
----@field public enabled? boolean
+---@class (exact) render.md.UserBullet: render.md.UserBaseComponent
 ---@field public icons? render.md.bullet.Icons
 ---@field public ordered_icons? render.md.bullet.Icons
 ---@field public left_pad? integer
 ---@field public right_pad? integer
 ---@field public highlight? string
 
----@class (exact) render.md.UserDash
----@field public enabled? boolean
+---@class (exact) render.md.UserDash: render.md.UserBaseComponent
 ---@field public icon? string
----@field public width? 'full'|integer
+---@field public width? 'full'|number
+---@field public left_margin? number
 ---@field public highlight? string
 
 ---@alias render.md.code.Style 'full'|'normal'|'language'|'none'
@@ -152,8 +147,7 @@ local M = {}
 ---@alias render.md.code.Width 'full'|'block'
 ---@alias render.md.code.Border 'thin'|'thick'|'none'
 
----@class (exact) render.md.UserCode
----@field public enabled? boolean
+---@class (exact) render.md.UserCode: render.md.UserBaseComponent
 ---@field public sign? boolean
 ---@field public style? render.md.code.Style
 ---@field public position? render.md.code.Position
@@ -169,22 +163,24 @@ local M = {}
 ---@field public above? string
 ---@field public below? string
 ---@field public highlight? string
----@field public highlight_inline? string
 ---@field public highlight_language? string
+---@field public inline_pad? integer
+---@field public highlight_inline? string
 
----@class (exact) render.md.UserParagraph
----@field public enabled? boolean
+---@class (exact) render.md.UserParagraph: render.md.UserBaseComponent
 ---@field public left_margin? number
 ---@field public min_width? integer
 
+---@alias render.md.heading.Icons
+---| string[]
+---| fun(sections: integer[]): string?
 ---@alias render.md.heading.Position 'overlay'|'inline'|'right'
 ---@alias render.md.heading.Width 'full'|'block'
 
----@class (exact) render.md.UserHeading
----@field public enabled? boolean
+---@class (exact) render.md.UserHeading: render.md.UserBaseComponent
 ---@field public sign? boolean
+---@field public icons? render.md.heading.Icons
 ---@field public position? render.md.heading.Position
----@field public icons? string[]
 ---@field public signs? string[]
 ---@field public width? render.md.heading.Width|(render.md.heading.Width)[]
 ---@field public left_margin? number|number[]
@@ -219,7 +215,7 @@ local M = {}
 ---| 'link'
 ---| 'sign'
 
----@alias render.md.config.conceal.Ignore table<render.md.Element, boolean|string[]>
+---@alias render.md.config.conceal.Ignore table<render.md.Element, render.md.Modes>
 
 ---@class (exact) render.md.UserAntiConceal
 ---@field public enabled? boolean
@@ -231,11 +227,13 @@ local M = {}
 ---@field public buftype? table<string, render.md.UserBufferConfig>
 ---@field public filetype? table<string, render.md.UserBufferConfig>
 
+---@alias render.md.Modes boolean|string[]
+
 ---@class (exact) render.md.UserBufferConfig
 ---@field public enabled? boolean
+---@field public render_modes? render.md.Modes
 ---@field public max_file_size? number
 ---@field public debounce? integer
----@field public render_modes? boolean|string[]
 ---@field public anti_conceal? render.md.UserAntiConceal
 ---@field public padding? render.md.UserPadding
 ---@field public heading? render.md.UserHeading
@@ -251,6 +249,7 @@ local M = {}
 ---@field public sign? render.md.UserSign
 ---@field public inline_highlight? render.md.UserInlineHighlight
 ---@field public indent? render.md.UserIndent
+---@field public latex? render.md.UserLatex
 ---@field public html? render.md.UserHtml
 ---@field public win_options? table<string, render.md.UserWindowOption>
 
@@ -263,7 +262,6 @@ local M = {}
 ---@field public log_runtime? boolean
 ---@field public file_types? string[]
 ---@field public injections? table<string, render.md.UserInjection>
----@field public latex? render.md.UserLatex
 ---@field public on? render.md.UserCallback
 ---@field public overrides? render.md.UserConfigOverrides
 ---@field public custom_handlers? table<string, render.md.Handler>
@@ -272,6 +270,10 @@ local M = {}
 M.default_config = {
     -- Whether Markdown should be rendered by default or not
     enabled = true,
+    -- Vim modes that will show a rendered view of the markdown file, :h mode(), for
+    -- all enabled components. Individual components can be enabled for other modes.
+    -- Remaining modes will be unaffected by this plugin.
+    render_modes = { 'n', 'c', 't' },
     -- Maximum file size (in MB) that this plugin will attempt to render
     -- Any file larger than this will effectively be ignored
     max_file_size = 10.0,
@@ -306,9 +308,6 @@ M.default_config = {
             ]],
         },
     },
-    -- Vim modes that will show a rendered view of the markdown file, :h mode()
-    -- All other modes will be unaffected by this plugin
-    render_modes = { 'n', 'c', 't' },
     anti_conceal = {
         -- This enables hiding any added text on the line the cursor is on
         enabled = true,
@@ -333,6 +332,8 @@ M.default_config = {
     latex = {
         -- Whether LaTeX should be rendered, mainly used for health check
         enabled = true,
+        -- Additional modes to render LaTeX
+        render_modes = false,
         -- Executable used to convert latex formula to rendered unicode
         converter = 'latex2text',
         -- Highlight for LaTeX blocks
@@ -351,17 +352,20 @@ M.default_config = {
     heading = {
         -- Turn on / off heading icon & background rendering
         enabled = true,
+        -- Additional modes to render headings
+        render_modes = false,
         -- Turn on / off any sign column related rendering
         sign = true,
+        -- Replaces '#+' of 'atx_h._marker'
+        -- The number of '#' in the heading determines the 'level'
+        -- The 'level' is used to index into the list using a cycle
+        -- If the value is a function the input is the nesting level of the heading within sections
+        icons = { '󰲡 ', '󰲣 ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' },
         -- Determines how icons fill the available space:
         --  right:   '#'s are concealed and icon is appended to right side
         --  inline:  '#'s are concealed and icon is inlined on left side
         --  overlay: icon is left padded with spaces and inserted on left hiding any additional '#'
         position = 'overlay',
-        -- Replaces '#+' of 'atx_h._marker'
-        -- The number of '#' in the heading determines the 'level'
-        -- The 'level' is used to index into the list using a cycle
-        icons = { '󰲡 ', '󰲣 ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' },
         -- Added to the sign column if enabled
         -- The 'level' is used to index into the list using a cycle
         signs = { '󰫎 ' },
@@ -422,6 +426,8 @@ M.default_config = {
     paragraph = {
         -- Turn on / off paragraph rendering
         enabled = true,
+        -- Additional modes to render paragraphs
+        render_modes = false,
         -- Amount of margin to add to the left of paragraphs
         -- If a floating point value < 1 is provided it is treated as a percentage of the available window space
         left_margin = 0,
@@ -431,6 +437,8 @@ M.default_config = {
     code = {
         -- Turn on / off code block & inline code rendering
         enabled = true,
+        -- Additional modes to render code blocks
+        render_modes = false,
         -- Turn on / off any sign column related rendering
         sign = true,
         -- Determines how code blocks & inline code are rendered:
@@ -480,27 +488,37 @@ M.default_config = {
         below = '▀',
         -- Highlight for code blocks
         highlight = 'RenderMarkdownCode',
-        -- Highlight for inline code
-        highlight_inline = 'RenderMarkdownCodeInline',
         -- Highlight for language, overrides icon provider value
         highlight_language = nil,
+        -- Padding to add to the left & right of inline code
+        inline_pad = 0,
+        -- Highlight for inline code
+        highlight_inline = 'RenderMarkdownCodeInline',
     },
     dash = {
         -- Turn on / off thematic break rendering
         enabled = true,
+        -- Additional modes to render dash
+        render_modes = false,
         -- Replaces '---'|'***'|'___'|'* * *' of 'thematic_break'
         -- The icon gets repeated across the window's width
         icon = '─',
         -- Width of the generated line:
-        --  <integer>: a hard coded width value
-        --  full:      full width of the window
+        --  <number>: a hard coded width value, if a floating point value < 1 is provided it is
+        --            treated as a percentage of the available window space
+        --  full:     full width of the window
         width = 'full',
+        -- Amount of margin to add to the left of dash
+        -- If a floating point value < 1 is provided it is treated as a percentage of the available window space
+        left_margin = 0,
         -- Highlight for the whole line generated from the icon
         highlight = 'RenderMarkdownDash',
     },
     bullet = {
         -- Turn on / off list bullet rendering
         enabled = true,
+        -- Additional modes to render list bullets
+        render_modes = false,
         -- Replaces '-'|'+'|'*' of 'list_item'
         -- How deeply nested the list is determines the 'level', how far down at that level determines the 'index'
         -- If a function is provided both of these values are passed in using 1 based indexing
@@ -530,6 +548,8 @@ M.default_config = {
     checkbox = {
         -- Turn on / off checkbox state rendering
         enabled = true,
+        -- Additional modes to render checkboxes
+        render_modes = false,
         -- Determines how icons fill the available space:
         --  inline:  underlying text is concealed resulting in a left aligned icon
         --  overlay: result is left padded with spaces to hide any additional text
@@ -565,6 +585,8 @@ M.default_config = {
     quote = {
         -- Turn on / off block quote & callout rendering
         enabled = true,
+        -- Additional modes to render quotes
+        render_modes = false,
         -- Replaces '>' of 'block_quote'
         icon = '▋',
         -- Whether to repeat icon on wrapped lines. Requires neovim >= 0.10. This will obscure text if
@@ -579,6 +601,8 @@ M.default_config = {
     pipe_table = {
         -- Turn on / off pipe table rendering
         enabled = true,
+        -- Additional modes to render pipe tables
+        render_modes = false,
         -- Pre configured settings largely for setting table border easier
         --  heavy:  use thicker border characters
         --  double: use double line border characters
@@ -658,6 +682,8 @@ M.default_config = {
     link = {
         -- Turn on / off inline link icon rendering
         enabled = true,
+        -- Additional modes to render links
+        render_modes = false,
         -- How to handle footnote links, start with a '^'
         footnote = {
             -- Replace value with superscript equivalent
@@ -706,6 +732,8 @@ M.default_config = {
     inline_highlight = {
         -- Turn on / off inline highlight rendering
         enabled = true,
+        -- Additional modes to render inline highlights
+        render_modes = false,
         -- Applies to background of surrounded text
         highlight = 'RenderMarkdownInlineHighlight',
     },
@@ -714,6 +742,8 @@ M.default_config = {
     indent = {
         -- Turn on / off org-indent-mode
         enabled = false,
+        -- Additional modes to render indents
+        render_modes = false,
         -- Amount of additional padding added for each heading level
         per_level = 2,
         -- Heading levels <= this value will not be indented
@@ -725,6 +755,8 @@ M.default_config = {
     html = {
         -- Turn on / off all HTML rendering
         enabled = true,
+        -- Additional modes to render HTML
+        render_modes = false,
         comment = {
             -- Turn on / off HTML comment concealing
             conceal = true,
@@ -756,7 +788,7 @@ M.default_config = {
     -- if no override is provided. Supports the following fields:
     --   enabled, max_file_size, debounce, render_modes, anti_conceal, padding,
     --   heading, paragraph, code, dash, bullet, checkbox, quote, pipe_table,
-    --   callout, link, sign, indent, html, win_options
+    --   callout, link, sign, indent, latex, html, win_options
     overrides = {
         -- Overrides for different buftypes, see :h 'buftype'
         buftype = {

@@ -1,10 +1,11 @@
+local Icons = require('render-markdown.lib.icons')
 local state = require('render-markdown.state')
 
 ---@class render.md.Health
 local M = {}
 
 ---@private
-M.version = '7.7.4'
+M.version = '7.8.3'
 
 function M.check()
     M.start('version')
@@ -20,7 +21,7 @@ function M.check()
         vim.health.error(message)
     end
 
-    local latex = state.latex
+    local latex = state.get(0).latex
     local latex_advice = 'Disable LaTeX support to avoid this warning by setting { latex = { enabled = false } }'
 
     M.start('nvim-treesitter')
@@ -36,6 +37,14 @@ function M.check()
         end
     else
         vim.health.error('not installed')
+    end
+
+    M.start('icons')
+    local provider = Icons.provider()
+    if provider ~= nil then
+        vim.health.ok('using: ' .. provider)
+    else
+        vim.health.warn('none installed')
     end
 
     M.start('executables')

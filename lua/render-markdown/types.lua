@@ -4,13 +4,6 @@
 ---@field public attach fun(buf: integer)
 ---@field public render fun(buf: integer)
 
----@class (exact) render.md.Latex
----@field public enabled boolean
----@field public converter string
----@field public highlight string
----@field public top_pad integer
----@field public bottom_pad integer
-
 ---@class (exact) render.md.Injection
 ---@field public enabled boolean
 ---@field public query string
@@ -19,23 +12,30 @@
 ---@field public default render.md.option.Value
 ---@field public rendered render.md.option.Value
 
+---@class (exact) render.md.BaseComponent
+---@field public enabled boolean
+---@field public render_modes render.md.Modes
+
 ---@class (exact) render.md.HtmlComment
 ---@field public conceal boolean
 ---@field public text? string
 ---@field public highlight string
 
----@class (exact) render.md.Html
----@field public enabled boolean
+---@class (exact) render.md.Html: render.md.BaseComponent
 ---@field public comment render.md.HtmlComment
 
----@class (exact) render.md.Indent
----@field public enabled boolean
+---@class (exact) render.md.Latex: render.md.BaseComponent
+---@field public converter string
+---@field public highlight string
+---@field public top_pad integer
+---@field public bottom_pad integer
+
+---@class (exact) render.md.Indent: render.md.BaseComponent
 ---@field public per_level integer
 ---@field public skip_level integer
 ---@field public skip_heading boolean
 
----@class (exact) render.md.InlineHighlight
----@field public enabled boolean
+---@class (exact) render.md.InlineHighlight: render.md.BaseComponent
 ---@field public highlight string
 
 ---@class (exact) render.md.Sign
@@ -56,8 +56,7 @@
 ---@field public prefix string
 ---@field public suffix string
 
----@class (exact) render.md.Link
----@field public enabled boolean
+---@class (exact) render.md.Link: render.md.BaseComponent
 ---@field public footnote render.md.Footnote
 ---@field public image string
 ---@field public email string
@@ -72,8 +71,7 @@
 ---@field public highlight string
 ---@field public quote_icon? string
 
----@class (exact) render.md.PipeTable
----@field public enabled boolean
+---@class (exact) render.md.PipeTable: render.md.BaseComponent
 ---@field public preset render.md.table.Preset
 ---@field public style render.md.table.Style
 ---@field public cell render.md.table.Cell
@@ -85,8 +83,7 @@
 ---@field public row string
 ---@field public filler string
 
----@class (exact) render.md.Quote
----@field public enabled boolean
+---@class (exact) render.md.Quote: render.md.BaseComponent
 ---@field public icon string
 ---@field public repeat_linebreak boolean
 ---@field public highlight string
@@ -102,29 +99,26 @@
 ---@field public highlight string
 ---@field public scope_highlight? string
 
----@class (exact) render.md.Checkbox
----@field public enabled boolean
+---@class (exact) render.md.Checkbox: render.md.BaseComponent
 ---@field public position render.md.checkbox.Position
 ---@field public unchecked render.md.CheckboxComponent
 ---@field public checked render.md.CheckboxComponent
 ---@field public custom table<string, render.md.CustomCheckbox>
 
----@class (exact) render.md.Bullet
----@field public enabled boolean
+---@class (exact) render.md.Bullet: render.md.BaseComponent
 ---@field public icons render.md.bullet.Icons
 ---@field public ordered_icons render.md.bullet.Icons
 ---@field public left_pad integer
 ---@field public right_pad integer
 ---@field public highlight string
 
----@class (exact) render.md.Dash
----@field public enabled boolean
+---@class (exact) render.md.Dash: render.md.BaseComponent
 ---@field public icon string
----@field public width 'full'|integer
+---@field public width 'full'|number
+---@field public left_margin number
 ---@field public highlight string
 
----@class (exact) render.md.Code
----@field public enabled boolean
+---@class (exact) render.md.Code: render.md.BaseComponent
 ---@field public sign boolean
 ---@field public style render.md.code.Style
 ---@field public position render.md.code.Position
@@ -140,19 +134,18 @@
 ---@field public above string
 ---@field public below string
 ---@field public highlight string
----@field public highlight_inline string
 ---@field public highlight_language? string
+---@field public inline_pad integer
+---@field public highlight_inline string
 
----@class (exact) render.md.Paragraph
----@field public enabled boolean
+---@class (exact) render.md.Paragraph: render.md.BaseComponent
 ---@field public left_margin number
 ---@field public min_width integer
 
----@class (exact) render.md.Heading
----@field public enabled boolean
+---@class (exact) render.md.Heading: render.md.BaseComponent
 ---@field public sign boolean
+---@field public icons render.md.heading.Icons
 ---@field public position render.md.heading.Position
----@field public icons string[]
 ---@field public signs string[]
 ---@field public width render.md.heading.Width|(render.md.heading.Width)[]
 ---@field public left_margin number|number[]
@@ -182,9 +175,9 @@
 
 ---@class (exact) render.md.BufferConfig
 ---@field public enabled boolean
+---@field public render_modes render.md.Modes
 ---@field public max_file_size number
 ---@field public debounce integer
----@field public render_modes boolean|string[]
 ---@field public anti_conceal render.md.AntiConceal
 ---@field public padding render.md.Padding
 ---@field public heading render.md.Heading
@@ -200,6 +193,7 @@
 ---@field public sign render.md.Sign
 ---@field public inline_highlight render.md.InlineHighlight
 ---@field public indent render.md.Indent
+---@field public latex render.md.Latex
 ---@field public html render.md.Html
 ---@field public win_options table<string, render.md.WindowOption>
 
@@ -209,7 +203,6 @@
 ---@field public log_runtime boolean
 ---@field public file_types string[]
 ---@field public injections table<string, render.md.Injection>
----@field public latex render.md.Latex
 ---@field public on render.md.Callback
 ---@field public overrides render.md.ConfigOverrides
 ---@field public custom_handlers table<string, render.md.Handler>

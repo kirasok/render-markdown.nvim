@@ -42,7 +42,10 @@ Render.__index = Render
 ---@return boolean
 function Render:setup()
     self.table = self.config.pipe_table
-    if not self.table.enabled or self.table.style == 'none' then
+    if self.context:skip(self.table) then
+        return false
+    end
+    if self.table.style == 'none' then
         return false
     end
     if self.node:has_error() then
@@ -89,8 +92,12 @@ function Render:setup()
     for _, row in ipairs(rows) do
         for i, column in ipairs(row.columns) do
             local width = column.width
+            local space_available = column.space.left + column.space.right - (2 * self.table.padding)
+            -- If we don't have enough space for padding add it to the width
+            if space_available < 0 then
+                width = width - space_available
+            end
             if self.table.cell == 'trimmed' then
-                local space_available = column.space.left + column.space.right - (2 * self.table.padding)
                 width = width - math.max(space_available, 0)
             end
             local delim_column = delim.columns[i]

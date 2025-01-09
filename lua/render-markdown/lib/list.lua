@@ -77,24 +77,19 @@ function Marks:conceal(element)
     if type(element) == 'boolean' then
         return element
     end
-    local value = self.ignore[element]
-    if value == nil then
+    local modes = self.ignore[element]
+    if modes == nil then
         return true
-    elseif type(value) == 'boolean' then
-        return not value
     else
-        return not vim.tbl_contains(value, self.context.mode)
+        return not util.in_modes(modes, self.context.mode)
     end
 end
 
 ---@private
 ---@param mark render.md.Mark
 function Marks:update_context(mark)
-    local end_col = mark.opts.end_col
-    if end_col == nil then
-        return
-    end
     local row, start_col = mark.start_row, mark.start_col
+    local end_col = mark.opts.end_col or start_col
     if mark.opts.conceal ~= nil then
         self.context.conceal:add(row, start_col, end_col, end_col - start_col)
     end
